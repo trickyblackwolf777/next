@@ -37,7 +37,7 @@ export default function Header({
           {showLogout && (
             <button
               onClick={handleLogout}
-              className="ml-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200 whitespace-nowrap"
+              className="ml-auto px-4 py-2 bg-black hover:bg-gray-800 text-white font-semibold rounded-lg transition-colors duration-200 whitespace-nowrap"
             >
               Logout
             </button>
