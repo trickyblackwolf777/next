@@ -91,8 +91,10 @@ export default function SignupForm() {
         lastName: formData.lastName,
         email: formData.email,
       });
-      // Redirect to login or dashboard after successful signup
-      // window.location.href = '/login';
+      // Redirect to home page after successful signup
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
