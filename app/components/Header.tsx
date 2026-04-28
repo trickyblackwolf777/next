@@ -1,5 +1,7 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 interface HeaderProps {
   title?: string;
   subtitle?: string;
@@ -13,6 +15,9 @@ export default function Header({
   className = "",
   showLogout = false,
 }: HeaderProps) {
+  const pathname = usePathname();
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
+
   const handleLogout = () => {
     // Clear any auth tokens or session data here
     // localStorage.removeItem('token');
@@ -34,7 +39,7 @@ export default function Header({
               <p className="mt-2 text-blue-100 text-lg sm:text-xl">{subtitle}</p>
             )}
           </div>
-          {showLogout && (
+          {showLogout && !isAuthPage && (
             <button
               onClick={handleLogout}
               className="ml-auto px-4 py-2 bg-black hover:bg-gray-800 text-white font-semibold rounded-lg transition-colors duration-200 whitespace-nowrap"
