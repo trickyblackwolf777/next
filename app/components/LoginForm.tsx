@@ -43,8 +43,10 @@ export default function LoginForm() {
       setPassword("");
       setRememberMe(false);
       console.log("Login attempt with:", { email, rememberMe });
-      // Redirect to dashboard after successful login
-      // window.location.href = '/dashboard';
+      // Redirect to home page after successful login
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
