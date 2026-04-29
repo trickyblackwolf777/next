@@ -30,13 +30,16 @@ export default function Header({
   avatar,
   className = "",
 }: HeaderProps) {
-  const [userData, setUserData] = useState<UserData | null>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('user');
-      return stored ? JSON.parse(stored) : null;
+  const [mounted, setMounted] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      setUserData(JSON.parse(stored));
     }
-    return null;
-  });
+    setMounted(true);
+  }, []);
 
   const finalUsername = username || userData?.username;
   const finalDisplayName = displayName || userData?.displayName;
@@ -56,7 +59,7 @@ export default function Header({
               <p className="mt-2 text-blue-100 text-lg sm:text-xl">{subtitle}</p>
             )}
           </div>
-          {finalUsername && (
+          {mounted && finalUsername && (
             <div className="flex items-center">
               <UserIdentity
                 username={finalUsername}
