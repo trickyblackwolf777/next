@@ -1,7 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import UserIdentity from './UserIdentity';
 
 interface HeaderProps {
@@ -30,17 +29,17 @@ export default function Header({
   avatar,
   className = "",
 }: HeaderProps) {
-  const [mounted, setMounted] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      setUserData(JSON.parse(stored));
+  const [state] = useState<{ mounted: boolean; userData: UserData | null }>(() => {
+    if (typeof window === 'undefined') {
+      return { mounted: false, userData: null };
     }
-    setMounted(true);
-  }, []);
+    const stored = localStorage.getItem('user');
+    const userData = stored ? JSON.parse(stored) : null;
+    return { mounted: true, userData };
+  });
 
+  const mounted = state.mounted;
+  const userData = state.userData;
   const finalUsername = username || userData?.username;
   const finalDisplayName = displayName || userData?.displayName;
   const finalAvatar = avatar || userData?.avatar;
