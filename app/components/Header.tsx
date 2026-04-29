@@ -29,29 +29,18 @@ export default function Header({
   displayName,
   avatar,
   className = "",
-  showLogout = false,
 }: HeaderProps) {
-  const pathname = usePathname();
-  const isAuthPage = pathname === "/login" || pathname === "/signup";
-  const [userData, setUserData] = useState<UserData | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      setUserData(JSON.parse(stored));
+  const [userData, setUserData] = useState<UserData | null>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
     }
-  }, []);
+    return null;
+  });
 
   const finalUsername = username || userData?.username;
   const finalDisplayName = displayName || userData?.displayName;
   const finalAvatar = avatar || userData?.avatar;
-
-  const handleLogout = () => {
-    // Clear any auth tokens or session data here
-    // localStorage.removeItem('token');
-    // sessionStorage.clear();
-    window.location.href = '/login';
-  };
 
   return (
     <header
