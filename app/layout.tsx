@@ -37,7 +37,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col">
-        <Header title="My App" />
+        <Header
+          title="My App"
+          username="johndoe"
+          displayName="John Doe"
+          avatar="https://api.dicebear.com/7.x/avataaars/svg?seed=johndoe"
+        />
         <main className="flex-1">{children}</main>
         <Footer links={footerLinks} companyName="My Next.js App" />
       </body>
