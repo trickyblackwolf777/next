@@ -38,6 +38,16 @@ export default function LoginForm() {
         throw new Error("Please enter a valid email address");
       }
 
+      // Store user data in localStorage
+      const userData = {
+        email: email,
+        username: email.split('@')[0],
+        displayName: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        isLoggedIn: true
+      };
+      localStorage.setItem('user', JSON.stringify(userData));
+      
       setSuccess(true);
       setEmail("");
       setPassword("");

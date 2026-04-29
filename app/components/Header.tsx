@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import UserIdentity from './UserIdentity';
 
 interface HeaderProps {
@@ -11,6 +12,14 @@ interface HeaderProps {
   avatar?: string;
   className?: string;
   showLogout?: boolean;
+}
+
+interface UserData {
+  email: string;
+  username: string;
+  displayName: string;
+  avatar: string;
+  isLoggedIn: boolean;
 }
 
 export default function Header({
@@ -24,6 +33,18 @@ export default function Header({
 }: HeaderProps) {
   const pathname = usePathname();
   const isAuthPage = pathname === "/login" || pathname === "/signup";
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      setUserData(JSON.parse(stored));
+    }
+  }, []);
+
+  const finalUsername = username || userData?.username;
+  const finalDisplayName = displayName || userData?.displayName;
+  const finalAvatar = avatar || userData?.avatar;
 
   const handleLogout = () => {
     // Clear any auth tokens or session data here
@@ -46,12 +67,12 @@ export default function Header({
               <p className="mt-2 text-blue-100 text-lg sm:text-xl">{subtitle}</p>
             )}
           </div>
-          {username && (
+          {finalUsername && (
             <div className="flex items-center">
               <UserIdentity
-                username={username}
-                displayName={displayName}
-                avatar={avatar}
+                username={finalUsername}
+                displayName={finalDisplayName}
+                avatar={finalAvatar}
               />
             </div>
           )}
