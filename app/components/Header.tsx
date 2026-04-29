@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UserIdentity from './UserIdentity';
 
 interface HeaderProps {
@@ -29,14 +29,25 @@ export default function Header({
   avatar,
   className = "",
 }: HeaderProps) {
-  const [state] = useState<{ mounted: boolean; userData: UserData | null }>(() => {
-    if (typeof window === 'undefined') {
-      return { mounted: false, userData: null };
-    }
-    const stored = localStorage.getItem('user');
-    const userData = stored ? JSON.parse(stored) : null;
-    return { mounted: true, userData };
+  const [state, setState] = useState<{ mounted: boolean; userData: UserData | null }>({
+    mounted: false,
+    userData: null
   });
+
+  const initRef = useRef(false);
+
+  useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+
+    try {
+      const stored = localStorage.getItem('user');
+      const userData = stored ? JSON.parse(stored) : null;
+      queueMicrotask(() => setState({ mounted: true, userData }));
+    } catch {
+      queueMicrotask(() => setState({ mounted: true, userData: null }));
+    }
+  }, []);
 
   const mounted = state.mounted;
   const userData = state.userData;
