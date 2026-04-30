@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import UserIdentity from './UserIdentity';
 
@@ -29,6 +30,7 @@ export default function Header({
   avatar,
   className = "",
 }: HeaderProps) {
+  const pathname = usePathname();
   const [state, setState] = useState<{ mounted: boolean; userData: UserData | null }>({
     mounted: false,
     userData: null
@@ -54,6 +56,10 @@ export default function Header({
   const finalUsername = username || userData?.username;
   const finalDisplayName = displayName || userData?.displayName;
   const finalAvatar = avatar || userData?.avatar;
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
+  const hasAuthenticatedIdentity = Boolean(
+    finalUsername && (username || userData?.isLoggedIn)
+  );
 
   return (
     <header
@@ -69,7 +75,7 @@ export default function Header({
               <p className="mt-2 text-blue-100 text-lg sm:text-xl">{subtitle}</p>
             )}
           </div>
-          {mounted && finalUsername && (
+          {mounted && !isAuthPage && hasAuthenticatedIdentity && (
             <div className="flex items-center">
               <UserIdentity
                 username={finalUsername}
