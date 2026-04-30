@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import UserIdentity from './UserIdentity';
 import UserProfilePanel from './UserProfilePanel';
@@ -39,6 +40,8 @@ export default function Header({
     userData: UserData | null;
     isProfileOpen: boolean;
   }>({
+  const pathname = usePathname();
+  const [state, setState] = useState<{ mounted: boolean; userData: UserData | null }>({
     mounted: false,
     userData: null,
     isProfileOpen: false,
@@ -75,6 +78,10 @@ export default function Header({
   const handleProfileClose = () => {
     setState(prev => ({ ...prev, isProfileOpen: false }));
   };
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
+  const hasAuthenticatedIdentity = Boolean(
+    finalUsername && (username || userData?.isLoggedIn)
+  );
 
   return (
     <>
@@ -105,6 +112,15 @@ export default function Header({
               </button>
             )}
           </div>
+          {mounted && !isAuthPage && hasAuthenticatedIdentity && (
+            <div className="flex items-center">
+              <UserIdentity
+                username={finalUsername}
+                displayName={finalDisplayName}
+                avatar={finalAvatar}
+              />
+            </div>
+          )}
         </div>
       </header>
 
