@@ -33,15 +33,14 @@ export default function Header({
   displayName,
   avatar,
   className = "",
-  userStatus = 'active',
+  userStatus,
 }: HeaderProps) {
-  const [state, setState] = useState<{ 
-    mounted: boolean; 
+  const pathname = usePathname();
+  const [state, setState] = useState<{
+    mounted: boolean;
     userData: UserData | null;
     isProfileOpen: boolean;
   }>({
-  const pathname = usePathname();
-  const [state, setState] = useState<{ mounted: boolean; userData: UserData | null }>({
     mounted: false,
     userData: null,
     isProfileOpen: false,
@@ -70,6 +69,11 @@ export default function Header({
   const finalAvatar = avatar || userData?.avatar;
   const finalEmail = userData?.email;
   const finalUserStatus = userStatus || userData?.status || 'active';
+  const isAuthPage = pathname === "/login" || pathname === "/signup";
+  const hasAuthenticatedIdentity = Boolean(
+    finalUsername && (username || userData?.isLoggedIn)
+  );
+  const shouldShowIdentity = mounted && !isAuthPage && hasAuthenticatedIdentity;
 
   const handleProfileClick = () => {
     setState(prev => ({ ...prev, isProfileOpen: true }));
@@ -78,10 +82,6 @@ export default function Header({
   const handleProfileClose = () => {
     setState(prev => ({ ...prev, isProfileOpen: false }));
   };
-  const isAuthPage = pathname === "/login" || pathname === "/signup";
-  const hasAuthenticatedIdentity = Boolean(
-    finalUsername && (username || userData?.isLoggedIn)
-  );
 
   return (
     <>
@@ -98,7 +98,7 @@ export default function Header({
                 <p className="mt-2 text-blue-100 text-lg sm:text-xl">{subtitle}</p>
               )}
             </div>
-            {mounted && finalUsername && (
+            {shouldShowIdentity && (
               <button
                 onClick={handleProfileClick}
                 className="flex items-center hover:opacity-80 transition-opacity cursor-pointer rounded-lg p-2 hover:bg-blue-700"
@@ -112,28 +112,21 @@ export default function Header({
               </button>
             )}
           </div>
-          {mounted && !isAuthPage && hasAuthenticatedIdentity && (
-            <div className="flex items-center">
-              <UserIdentity
-                username={finalUsername}
-                displayName={finalDisplayName}
-                avatar={finalAvatar}
-              />
-            </div>
-          )}
         </div>
       </header>
 
       {/* Profile Panel */}
-      <UserProfilePanel
-        isOpen={isProfileOpen}
-        onClose={handleProfileClose}
-        username={finalUsername}
-        displayName={finalDisplayName}
-        avatar={finalAvatar}
-        email={finalEmail}
-        userStatus={finalUserStatus}
-      />
+      {shouldShowIdentity && (
+        <UserProfilePanel
+          isOpen={isProfileOpen}
+          onClose={handleProfileClose}
+          username={finalUsername}
+          displayName={finalDisplayName}
+          avatar={finalAvatar}
+          email={finalEmail}
+          userStatus={finalUserStatus}
+        />
+      )}
     </>
   );
 }
