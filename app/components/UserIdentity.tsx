@@ -5,6 +5,7 @@ interface UserIdentityProps {
   displayName?: string;
   avatar?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 export default function UserIdentity({
@@ -12,9 +13,14 @@ export default function UserIdentity({
   displayName,
   avatar,
   className = "",
+  onClick,
 }: UserIdentityProps) {
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div 
+      className={`flex items-center gap-3 ${className}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+    >
       {avatar && (
         <img
           src={avatar}
