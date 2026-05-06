@@ -1,7 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import UserStatus, { type UserStatusType } from './UserStatus';
+import { X } from "lucide-react";
+
+import { Button } from "@/src/components/ui/button";
+import { cn } from "@/src/lib/utils";
+import UserStatus, { type UserStatusType } from "./UserStatus";
 
 interface UserProfilePanelProps {
   isOpen: boolean;
@@ -16,125 +19,107 @@ interface UserProfilePanelProps {
 export default function UserProfilePanel({
   isOpen,
   onClose,
-  username = 'guest',
+  username = "guest",
   displayName,
   avatar,
   email,
-  userStatus = 'active',
+  userStatus = "active",
 }: UserProfilePanelProps) {
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+        className="fixed inset-0 z-40 bg-black/50"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Panel */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-white shadow-xl z-50 overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Profile</h2>
-          <button
+      <aside className="fixed right-0 top-0 z-50 h-full w-full max-w-sm overflow-y-auto border-l bg-background shadow-xl">
+        <div className="sticky top-0 flex items-center justify-between border-b bg-background px-6 py-4">
+          <h2 className="text-lg font-semibold tracking-normal">Profile</h2>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="text-white hover:bg-blue-700 rounded-lg p-2 transition-colors"
             aria-label="Close profile panel"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+            <X />
+          </Button>
         </div>
 
-        {/* Content */}
-        <div className="px-6 py-6 space-y-6">
-          {/* User Avatar and Identity */}
+        <div className="space-y-6 px-6 py-6">
           <div className="flex flex-col items-center text-center">
             {avatar && (
-              <img
-                src={avatar}
-                alt={displayName || username}
-                className="w-20 h-20 rounded-full object-cover border-4 border-blue-200 mb-3"
+              <span
+                role="img"
+                aria-label={displayName || username}
+                className="mb-3 size-20 rounded-full border bg-cover bg-center"
+                style={{ backgroundImage: `url(${avatar})` }}
               />
             )}
             {displayName && (
-              <h3 className="text-lg font-bold text-gray-900">{displayName}</h3>
+              <h3 className="text-lg font-semibold">{displayName}</h3>
             )}
-            <p className="text-sm text-gray-600">@{username}</p>
+            <p className="text-sm text-muted-foreground">@{username}</p>
             {email && (
-              <p className="text-sm text-gray-600 mt-1">{email}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{email}</p>
             )}
           </div>
 
-          {/* User Status */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Account Status</h4>
+            <h4 className="mb-3 text-sm font-medium">Account Status</h4>
             <UserStatus status={userStatus} userId={username} />
           </div>
 
-          {/* Profile Information */}
           <div className="border-t pt-6">
-            <h4 className="text-sm font-semibold text-gray-700 mb-4">Account Information</h4>
+            <h4 className="mb-4 text-sm font-medium">Account Information</h4>
             <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Username
-                </label>
-                <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded">
-                  {username}
-                </p>
-              </div>
-              {email && (
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Email
-                  </label>
-                  <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded">
-                    {email}
-                  </p>
-                </div>
-              )}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Account Status
-                </label>
-                <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded capitalize">
-                  {userStatus.replace('-', ' ')}
-                </p>
-              </div>
+              <ProfileField label="Username" value={username} />
+              {email && <ProfileField label="Email" value={email} />}
+              <ProfileField
+                label="Account Status"
+                value={userStatus.replace("-", " ")}
+                className="capitalize"
+              />
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="border-t pt-6 space-y-3">
-            <button
-              onClick={onClose}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-            >
+          <div className="space-y-3 border-t pt-6">
+            <Button type="button" onClick={onClose} className="w-full">
               Close
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
               onClick={onClose}
-              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors"
+              className="w-full"
             >
               Logout
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </aside>
     </>
+  );
+}
+
+function ProfileField({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div>
+      <p className="mb-1 text-xs font-medium text-muted-foreground">{label}</p>
+      <p className={cn("rounded-md border bg-muted px-3 py-2 text-sm", className)}>
+        {value}
+      </p>
+    </div>
   );
 }

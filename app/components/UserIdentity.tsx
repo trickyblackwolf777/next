@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+import { cn } from "@/src/lib/utils";
 
 interface UserIdentityProps {
   username?: string;
@@ -16,23 +18,26 @@ export default function UserIdentity({
   onClick,
 }: UserIdentityProps) {
   return (
-    <div 
-      className={`flex items-center gap-3 ${className}`}
+    <div
+      className={cn("flex items-center gap-3 text-left", className)}
       onClick={onClick}
       role={onClick ? "button" : undefined}
     >
       {avatar && (
-        <img
-          src={avatar}
-          alt={displayName || username}
-          className="w-10 h-10 rounded-full object-cover border-2 border-white"
+        <span
+          role="img"
+          aria-label={displayName || username}
+          className="size-9 rounded-full border bg-cover bg-center"
+          style={{ backgroundImage: `url(${avatar})` }}
         />
       )}
       <div className="flex flex-col justify-center">
         {displayName && (
-          <p className="text-sm font-semibold text-white">{displayName}</p>
+          <p className="text-sm font-medium leading-none text-foreground">
+            {displayName}
+          </p>
         )}
-        <p className="text-xs text-blue-100">@{username}</p>
+        <p className="mt-1 text-xs text-muted-foreground">@{username}</p>
       </div>
     </div>
   );

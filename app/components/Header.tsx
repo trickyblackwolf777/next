@@ -2,9 +2,11 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import UserIdentity from './UserIdentity';
-import UserProfilePanel from './UserProfilePanel';
-import { type UserStatusType } from './UserStatus';
+import UserIdentity from "./UserIdentity";
+import UserProfilePanel from "./UserProfilePanel";
+import { Button } from "@/src/components/ui/button";
+import { cn } from "@/src/lib/utils";
+import { type UserStatusType } from "./UserStatus";
 
 interface HeaderProps {
   title?: string;
@@ -53,11 +55,13 @@ export default function Header({
     initRef.current = true;
 
     try {
-      const stored = localStorage.getItem('user');
+      const stored = localStorage.getItem("user");
       const userData = stored ? JSON.parse(stored) : null;
-      queueMicrotask(() => setState(prev => ({ ...prev, mounted: true, userData })));
+      queueMicrotask(() => setState((prev) => ({ ...prev, mounted: true, userData })));
     } catch {
-      queueMicrotask(() => setState(prev => ({ ...prev, mounted: true, userData: null })));
+      queueMicrotask(() =>
+        setState((prev) => ({ ...prev, mounted: true, userData: null })),
+      );
     }
   }, []);
 
@@ -68,7 +72,7 @@ export default function Header({
   const finalDisplayName = displayName || userData?.displayName;
   const finalAvatar = avatar || userData?.avatar;
   const finalEmail = userData?.email;
-  const finalUserStatus = userStatus || userData?.status || 'active';
+  const finalUserStatus = userStatus || userData?.status || "active";
   const isAuthPage = pathname === "/login" || pathname === "/signup";
   const hasAuthenticatedIdentity = Boolean(
     finalUsername && (username || userData?.isLoggedIn)
@@ -76,32 +80,34 @@ export default function Header({
   const shouldShowIdentity = mounted && !isAuthPage && hasAuthenticatedIdentity;
 
   const handleProfileClick = () => {
-    setState(prev => ({ ...prev, isProfileOpen: true }));
+    setState((prev) => ({ ...prev, isProfileOpen: true }));
   };
 
   const handleProfileClose = () => {
-    setState(prev => ({ ...prev, isProfileOpen: false }));
+    setState((prev) => ({ ...prev, isProfileOpen: false }));
   };
 
   return (
     <>
       <header
-        className={`bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg ${className}`}
+        className={cn("border-b bg-background text-foreground", className)}
       >
-        <div className="container mx-auto px-4 py-6 sm:py-8">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate text-2xl font-semibold tracking-normal">
                 {title}
               </h1>
               {subtitle && (
-                <p className="mt-2 text-blue-100 text-lg sm:text-xl">{subtitle}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
               )}
             </div>
             {shouldShowIdentity && (
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={handleProfileClick}
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer rounded-lg p-2 hover:bg-blue-700"
+                className="h-auto px-2 py-1.5"
                 aria-label="Open user profile"
               >
                 <UserIdentity
@@ -109,7 +115,7 @@ export default function Header({
                   displayName={finalDisplayName}
                   avatar={finalAvatar}
                 />
-              </button>
+              </Button>
             )}
           </div>
         </div>

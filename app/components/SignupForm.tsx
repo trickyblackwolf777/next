@@ -1,8 +1,26 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { Loader2 } from "lucide-react";
 
-export default function SignupForm() {
+import { Button } from "@/src/components/ui/button";
+import { Checkbox } from "@/src/components/ui/checkbox";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+
+interface SignupFormProps {
+  redirectOnSuccess?: boolean;
+  redirectTo?: string;
+  simulateDelayMs?: number;
+  onSuccess?: (email: string) => void;
+}
+
+export default function SignupForm({
+  redirectOnSuccess = true,
+  redirectTo = "/dashboard",
+  simulateDelayMs = 1500,
+  onSuccess,
+}: SignupFormProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -15,24 +33,21 @@ export default function SignupForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, value, type, checked } = e.currentTarget;
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = event.currentTarget;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError("");
     setSuccess(false);
     setIsLoading(true);
 
     try {
-      // Validation
       if (
         !formData.firstName ||
         !formData.lastName ||
@@ -59,24 +74,9 @@ export default function SignupForm() {
         throw new Error("You must agree to the terms and conditions");
       }
 
-      // TODO: Replace with your actual authentication API call
-      // Example:
-      // const response = await fetch('/api/auth/signup', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     firstName: formData.firstName,
-      //     lastName: formData.lastName,
-      //     email: formData.email,
-      //     password: formData.password,
-      //   })
-      // });
-      // const data = await response.json();
-      // if (!response.ok) throw new Error(data.message);
+      await new Promise((resolve) => setTimeout(resolve, simulateDelayMs));
 
-      // Simulated API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      onSuccess?.(formData.email);
       setSuccess(true);
       setFormData({
         firstName: "",
@@ -86,15 +86,12 @@ export default function SignupForm() {
         confirmPassword: "",
         agreeToTerms: false,
       });
-      console.log("Signup attempt with:", {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-      });
-      // Redirect to dashboard after successful signup
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1500);
+
+      if (redirectOnSuccess) {
+        setTimeout(() => {
+          window.location.href = redirectTo;
+        }, 1500);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
@@ -104,179 +101,121 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Error Message */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-3 text-red-700 dark:text-red-200 text-sm">
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </div>
       )}
 
-      {/* Success Message */}
       {success && (
-        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3 text-green-700 dark:text-green-200 text-sm">
-          Account created successfully! Redirecting...
+        <div className="rounded-md border border-primary/20 bg-primary/10 px-3 py-2 text-sm text-foreground">
+          Account created successfully{redirectOnSuccess ? "! Redirecting..." : "."}
         </div>
       )}
 
-      {/* First Name Field */}
-      <div className="space-y-2">
-        <label
-          htmlFor="firstName"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          First Name
-        </label>
-        <input
-          id="firstName"
-          type="text"
-          name="firstName"
-          value={formData.firstName}
-          onChange={handleChange}
-          placeholder="John"
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-          disabled={isLoading}
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            id="firstName"
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="John"
+            disabled={isLoading}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Doe"
+            disabled={isLoading}
+          />
+        </div>
       </div>
 
-      {/* Last Name Field */}
       <div className="space-y-2">
-        <label
-          htmlFor="lastName"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          Last Name
-        </label>
-        <input
-          id="lastName"
-          type="text"
-          name="lastName"
-          value={formData.lastName}
-          onChange={handleChange}
-          placeholder="Doe"
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-          disabled={isLoading}
-        />
-      </div>
-
-      {/* Email Field */}
-      <div className="space-y-2">
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          Email Address
-        </label>
-        <input
-          id="email"
+        <Label htmlFor="signupEmail">Email Address</Label>
+        <Input
+          id="signupEmail"
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           placeholder="you@example.com"
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
           disabled={isLoading}
         />
       </div>
 
-      {/* Password Field */}
       <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          Password
-        </label>
-        <input
-          id="password"
+        <Label htmlFor="signupPassword">Password</Label>
+        <Input
+          id="signupPassword"
           type="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
-          placeholder="••••••••"
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          placeholder="Password"
           disabled={isLoading}
         />
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          Must be at least 8 characters
-        </p>
+        <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
       </div>
 
-      {/* Confirm Password Field */}
       <div className="space-y-2">
-        <label
-          htmlFor="confirmPassword"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          Confirm Password
-        </label>
-        <input
+        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <Input
           id="confirmPassword"
           type="password"
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
-          placeholder="••••••••"
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+          placeholder="Confirm password"
           disabled={isLoading}
         />
       </div>
 
-      {/* Terms & Conditions Checkbox */}
-      <label className="flex items-start space-x-2 cursor-pointer pt-2">
-        <input
-          type="checkbox"
+      <div className="flex items-start space-x-2 pt-2">
+        <Checkbox
+          id="agreeToTerms"
           name="agreeToTerms"
           checked={formData.agreeToTerms}
-          onChange={handleChange}
-          className="w-4 h-4 mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+          onCheckedChange={(checked) =>
+            setFormData((prev) => ({ ...prev, agreeToTerms: checked === true }))
+          }
           disabled={isLoading}
+          className="mt-0.5"
         />
-        <span className="text-sm text-gray-600 dark:text-gray-400">
+        <Label
+          htmlFor="agreeToTerms"
+          className="cursor-pointer text-muted-foreground"
+        >
           I agree to the{" "}
-          <a href="/terms" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+          <a href="/terms" className="text-primary underline-offset-4 hover:underline">
             Terms of Service
-          </a>
-          {" "}and{" "}
-          <a href="/privacy" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+          </a>{" "}
+          and{" "}
+          <a href="/privacy" className="text-primary underline-offset-4 hover:underline">
             Privacy Policy
           </a>
-        </span>
-      </label>
+        </Label>
+      </div>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:disabled:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:cursor-not-allowed pt-2"
-      >
+      <Button type="submit" disabled={isLoading} className="w-full">
         {isLoading ? (
-          <span className="flex items-center justify-center">
-            <svg
-              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
+          <>
+            <Loader2 className="animate-spin" />
             Creating account...
-          </span>
+          </>
         ) : (
           "Create Account"
         )}
-      </button>
+      </Button>
     </form>
   );
 }
